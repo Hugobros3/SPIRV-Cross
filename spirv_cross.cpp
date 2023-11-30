@@ -625,9 +625,22 @@ bool Compiler::is_matrix(const SPIRType &type) const
 	return type.vecsize > 1 && type.columns > 1;
 }
 
+static bool compare_array(const SmallVector<uint32_t>&a, const SmallVector<uint32_t>&b) {
+	if (a.size() != b.size())
+		return false;
+	for (size_t i = 0; i < a.size(); i++)
+		if (a[i] != b[i])
+			return false;
+	return true;
+}
+
 bool Compiler::is_array(const SPIRType &type) const
 {
-	return !type.array.empty();
+	if (type.array.empty())
+		return false;
+	if (compare_array(get_type(type.parent_type).array, type.array))
+		return false;
+	return true;
 }
 
 bool Compiler::is_runtime_size_array(const SPIRType &type)
